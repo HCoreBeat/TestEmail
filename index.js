@@ -35,11 +35,17 @@ app.use(express.json());
 app.post('/send-email', async (req, res) => {
     try {
         const googleScriptUrl = process.env.GOOGLE_SCRIPT_URL;
-        
+        const { subject, body } = req.body;
+
+        // Validación básica
+        if (!subject || !body) {
+            return res.status(400).json({ error: 'Faltan campos requeridos' });
+        }
+
         const response = await axios.post(googleScriptUrl, {
-            email: 'alederibia@gmail.com',
-            subject: 'Asunto del correo',
-            body: 'Contenido del correo electrónico'
+            email: 'alederibia@gmail.com', // Puedes hacerlo editable también
+            subject: subject,
+            body: body
         });
 
         res.json({ message: 'Correo enviado exitosamente!' });
