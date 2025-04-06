@@ -35,23 +35,21 @@ app.use(express.json());
 app.post('/send-email', async (req, res) => {
     try {
         const googleScriptUrl = process.env.GOOGLE_SCRIPT_URL;
-        const { subject, body } = req.body;
+        const orderData = req.body;
 
         // Validación básica
-        if (!subject || !body) {
-            return res.status(400).json({ error: 'Faltan campos requeridos' });
+        if (!orderData.correo_comprador || !orderData.compras?.length) {
+            return res.status(400).json({ error: 'Datos incompletos' });
         }
 
-        const response = await axios.post(googleScriptUrl, {
-            email: 'alederibia@gmail.com', // Puedes hacerlo editable también
-            subject: subject,
-            body: body
-        });
+        // Enviar a Google Script
+        await axios.post(googleScriptUrl, orderData);
 
-        res.json({ message: 'Correo enviado exitosamente!' });
+        res.json({ message: 'Pedido procesado correctamente' });
+        
     } catch (error) {
-        console.error('Error en el backend:', error);
-        res.status(500).json({ error: 'Error al enviar el correo' });
+        console.error('Error backend:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 
